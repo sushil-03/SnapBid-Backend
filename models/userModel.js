@@ -43,21 +43,17 @@ const userSchema = new mongoose.Schema({
   country: {
     type: String,
     trim: true,
-    required: [true, "Please Enter Your Country"],
   },
   pincode: {
     type: String,
     trim: true,
-    required: [true, "Please Enter Your pin code"],
   },
   state: {
     type: String,
     trim: true,
-    required: [true, "Please Enter Your pin code"],
   },
   contact: {
     type: String,
-    required: [true, "Please Enter Your Phone number"],
   },
   createdAt: {
     type: Date,

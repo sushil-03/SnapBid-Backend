@@ -16,33 +16,56 @@ const productSchema = new mongoose.Schema({
     required: [true, "Please enter product description "],
     trim: true,
   },
-
+  maxBid: {
+    type: Number,
+    default: function () {
+      return this.startingBid;
+    },
+  },
+  allBidder: [
+    {
+      bidder: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+      bidAmount: {
+        type: Number,
+      },
+    },
+  ],
+  bidwinner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
   images: [
     {
-      name: {
+      filename: {
         type: String,
         required: true,
       },
-      url: {
+      fileimage: {
         type: String,
         required: true,
+      },
+      _id: {
+        type: String,
       },
     },
   ],
   category: {
-    type: string,
+    type: String,
     required: [true, "Please enter product category "],
   },
   owner: {
-    type: string,
+    type: String,
     required: [true, "Please enter product category "],
   },
   condition: {
-    type: string,
+    type: String,
     required: [true, "Please enter product category "],
   },
   location: {
-    type: string,
+    type: String,
     required: [true, "Please enter product category "],
   },
   startingBid: {
@@ -65,12 +88,17 @@ const productSchema = new mongoose.Schema({
     type: Date,
     required: [true, "Please enter product ending Time "],
   },
-  payment: {
+  paymentInfo: {
     type: String,
     enum: ["Online Payment", "Cash on Delivery", "POS on Delivery"],
     required: true,
   },
-  shipping: {
+  status: {
+    type: String,
+    enum: ["Pending", "Active", "Completed"],
+    default: "Pending",
+  },
+  shippingInfo: {
     type: String,
     enum: ["self", "arrange"],
     required: true,
@@ -78,30 +106,11 @@ const productSchema = new mongoose.Schema({
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
-    required: true,
   },
-
   createdAt: {
     type: Date,
     default: Date.now,
   },
 });
 
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) {
-    next();
-  }
-  this.password = await bcrypt.hash(this.password, 10);
-});
-userSchema.methods.getJWTToken = function () {
-  return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRE,
-  });
-};
-userSchema.methods.comparePassword = async function (
-  originalPass,
-  enteredPassword
-) {
-  return await bcrypt.compare(originalPass, enteredPassword);
-};
-module.exports = mongoose.model("User", userSchema);
+module.exports = mongoose.model("Product", productSchema);

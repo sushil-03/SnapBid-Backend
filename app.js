@@ -16,7 +16,8 @@ app.use(bodyParser.urlencoded({ limit: "1000mb", extended: true }));
 
 // Routes
 const user = require("./router/userRouter");
+const product = require("./router/productRouter");
 // const video = require("./router/videoRouter");
 app.use("/api/v1", user);
-// app.use("/api/v1", video);
+app.use("/api/v1", product);
 module.exports = app;
