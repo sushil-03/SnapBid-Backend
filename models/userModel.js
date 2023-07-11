@@ -48,6 +48,18 @@ const userSchema = new mongoose.Schema({
     type: String,
     trim: true,
   },
+  revenue: {
+    type: Number,
+    default: 0,
+  },
+  bidWon: [
+    {
+      product: {
+        type: mongoose.Schema.ObjectId,
+        ref: "Product",
+      },
+    },
+  ],
   state: {
     type: String,
     trim: true,
@@ -59,6 +71,14 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  products: [
+    {
+      product: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product",
+      },
+    },
+  ],
 });
 
 userSchema.pre("save", async function (next) {

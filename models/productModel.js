@@ -31,6 +31,22 @@ const productSchema = new mongoose.Schema({
       bidAmount: {
         type: Number,
       },
+      paymentInfo: {
+        status: {
+          type: String,
+          enum: ["Prohibited", "Pending", "Completed", "Expired"],
+          default: "Prohibited",
+        },
+        paymentAt: {
+          type: Date,
+        },
+        paymentDeadline: {
+          type: Date,
+        },
+        paymentAmount: {
+          type: Number,
+        },
+      },
     },
   ],
   bidwinner: {
@@ -72,22 +88,15 @@ const productSchema = new mongoose.Schema({
     type: Number,
     required: [true, "Please enter product startingBid "],
   },
-  startingDate: {
+  starting: {
     type: Date,
     required: [true, "Please enter product starting Date "],
   },
-  endingDate: {
+  ending: {
     type: Date,
-    required: [true, "Please enter product ending Date "],
+    required: [true, "Please enter product starting Date "],
   },
-  startingTime: {
-    type: Date,
-    required: [true, "Please enter product starting Time "],
-  },
-  endingTime: {
-    type: Date,
-    required: [true, "Please enter product ending Time "],
-  },
+
   paymentInfo: {
     type: String,
     enum: ["Online Payment", "Cash on Delivery", "POS on Delivery"],
@@ -95,7 +104,7 @@ const productSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ["Pending", "Active", "Completed"],
+    enum: ["Pending", "Active", "Transaction", "Completed", "Expired"],
     default: "Pending",
   },
   shippingInfo: {

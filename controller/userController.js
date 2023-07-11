@@ -1,7 +1,7 @@
 const AsyncError = require("../middleware/asyncError");
 const User = require("../models/userModel");
 const sendToken = require("../utils/sendToken");
-
+const ErrorHandler = require("../utils/errorHandler");
 //Register a User
 exports.registerUser = AsyncError(async (req, res, next) => {
   const {
@@ -65,8 +65,10 @@ exports.logoutUser = AsyncError(async (req, res, next) => {
 
 //Get User details
 exports.getUserDetails = AsyncError(async (req, res, next) => {
-  const user = await User.findById(req.user.id);
+  const _id = req.params.id;
+  const user = await User.findById(_id);
 
+  console.log("This user is requ", user);
   res.status(200).json({
     success: true,
     user,
@@ -130,7 +132,11 @@ exports.loadUser = AsyncError(async (req, res, next) => {
   });
 });
 exports.getSingleUser = AsyncError(async (req, res, next) => {
-  const user = await User.findById(req.params.id);
+  const user = await User.findById(req.params.id)
+    .populate("products.product")
+    .populate("bidWon.product");
+  console.log("req.params.id", req.params.id);
+  console.log("user", user);
   if (!user) {
     return next(new ErrorHandler(`User must sign in first`), 400);
   }
