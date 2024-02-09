@@ -3,6 +3,7 @@ const Product = require("../models/productModel");
 const CronJob = require("cron").CronJob;
 const schedule = require("node-schedule");
 const User = require("../models/userModel");
+const cloudinary = require("cloudinary");
 
 const helper = async () => {
   // running Product
@@ -143,6 +144,30 @@ exports.placeBid = AsyncError(async (req, res, next) => {
     product,
   });
 });
+const processImage = async (images) => {
+  let updated_images = [];
+  if (typeof images === "string") {
+    updated_images.push(images);
+  } else {
+    updated_images = images;
+  }
+
+  const imageLink = [];
+  for (var i = 0; i < images.length; i++) {
+    const result = await cloudinary.v2.uploader.upload(
+      updated_images[i].fileimage,
+      {
+        folder: "products",
+      }
+    );
+    imageLink.push({
+      id: result.public_id,
+      fileimage: result.secure_url,
+      filename: updated_images[i].filename,
+    });
+  }
+  return imageLink;
+};
 exports.createProduct = AsyncError(async (req, res, next) => {
   const {
     brand,
@@ -164,6 +189,9 @@ exports.createProduct = AsyncError(async (req, res, next) => {
     shippingInfo,
   } = req.body;
 
+  console.log("image before", images);
+  let imagesLink = await processImage(images);
+  console.log("image after", imagesLink);
   const product = await Product.create({
     brand,
     title,
@@ -175,7 +203,7 @@ exports.createProduct = AsyncError(async (req, res, next) => {
     startingDate,
     startingTime,
     startingBid,
-    images,
+    images: imagesLink,
     location,
     owner,
     starting,
@@ -187,7 +215,7 @@ exports.createProduct = AsyncError(async (req, res, next) => {
   const user = await User.findById({ _id: req.user._id });
   user.products.push({ product: product._id });
   await user.save();
-
+  console.log("saved user");
   schedule.scheduleJob(starting, async () => {
     console.log("Starting helper ***********************");
     await helper();
