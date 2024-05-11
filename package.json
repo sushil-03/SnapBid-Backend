@@ -5,13 +5,16 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc && cp ./src/config/config.env ./dist/config/config.env",
+    "build": "npm install && tsc  && cp ./src/config/config.env ./dist/config/config.env",
     "dev": "tsc -w && nodemon dist/index.js",
-    "start": "node dist/index.js"
+    "start": "ls && cat package.json && node dist/index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "engines": {
+    "node": ">=18.18.0 <19.0.0"
+  },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
     "@types/cookie-parser": "^1.4.7",
