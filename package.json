@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npm install && tsc  && cp ./src/config/config.env ./dist/config/config.env",
     "dev": "tsc -w && nodemon dist/index.js",
-    "start": "ls && cat package.json && node dist/index.js"
+    "start": "node dist/index.js"
   },
   "keywords": [],
   "author": "",

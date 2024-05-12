@@ -408,17 +408,18 @@ export const updateProductStatusOnSuccess = async ({
 //   // const now = new Date();
 //   return `${time.getHours()} : ${time.getMinutes()} :${time.getSeconds()}  `;
 // };
-function subtractTimes(time1: Date, time2: Date) {
+function subtractTimes(currTime: Date, endingTime: Date, timeToPay: number) {
   // Convert time strings to Date objects
-  const date1 = new Date(time1);
-  const date2 = new Date(time2);
+  const date1 = new Date(currTime);
+  const date2 = new Date(endingTime);
 
   // Calculate the time difference in milliseconds
   const differenceMs = date1.getTime() - date2.getTime();
   const newdate = new Date(differenceMs);
-  const index = differenceMs / (30 * 60 * 1000);
-  const rem = 30 * 60 * 100 - differenceMs;
-  console.log("remainging time", rem, differenceMs, newdate);
+  const index = differenceMs / (timeToPay * 60 * 1000);
+
+  const rem = timeToPay * 60 * 100 - differenceMs;
+  console.log("remainging time", rem, differenceMs, newdate, index);
 
   return Math.floor(index);
 }
@@ -500,26 +501,37 @@ export const restartCronJob = async () => {
         console.log("Change product status to transaction");
         product.status = "Transaction";
 
-        const index = subtractTimes(currentTime, product.ending);
+        const index = subtractTimes(currentTime, product.ending, product.timeToPay);
         console.log("Allow bidder of index to pay", index);
 
         const allBidder =
           product.allBidder.sort((a, b) => b.bidAmount - a.bidAmount) || [];
-        allBidder[index].paymentInfo.status = "Pending";
-        const deadline = addMinutesToDeadline(
-          product.ending,
-          (index + 1) * product.timeToPay
-        );
-        if (index != 0) {
-          allBidder[index - 1].paymentInfo.status = "Prohibited";
-        }
-        allBidder[index].paymentInfo.paymentDeadline = new Date(deadline);
-        await product.save();
+        console.log('all bidder endingllll', product.ending);
+        console.log('all bidder', allBidder);
 
-        console.log("Started CRON JOB for next payment ");
-        const newJob = schedule.scheduleJob(deadline, async () => {
-          await allowNextBidder(product._id, index + 1, newJob);
-        });
+        console.log('index bidder', index);
+
+        allBidder[index].paymentInfo.status = "Pending";
+        if (index >= allBidder.length) {
+          product.status = "Expired";
+          await product.save();
+        } else {
+          const deadline = addMinutesToDeadline(
+            product.ending,
+            (index + 1) * product.timeToPay
+          );
+          if (index != 0) {
+            allBidder[index - 1].paymentInfo.status = "Prohibited";
+          }
+          allBidder[index].paymentInfo.paymentDeadline = new Date(deadline);
+          await product.save();
+
+          console.log("Started CRON JOB for next payment ");
+          const newJob = schedule.scheduleJob(deadline, async () => {
+            await allowNextBidder(product._id, index + 1, newJob);
+          });
+        }
+
       } else {
         console.log("EXPIRING PRODUCT");
         product.status = "Expired";
