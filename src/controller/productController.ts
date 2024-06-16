@@ -351,17 +351,21 @@ export const updateProductStatusOnSuccess = async ({
   productId: Types.ObjectId,
   bidder: Types.ObjectId,
 }) => {
+console.log("Updating backend from online payment")
   const product = await Product.findOne({
     _id: productId,
     ending: { $lte: Date.now() },
   });
+  console.log("product fonfound",product)
   if (!product) {
     return { success: false, message: "Product not found" }
   }
 
-  const selectedBidder = product.allBidder.find((currBidder) => {
-    return currBidder._id === bidder;
+  const selectedBidder = product.allBidder.find((currBidder:any) => {
+    return currBidder._id.toString() === bidder.toString();
   });
+
+  console.log("selected bidde",selectedBidder,bidder)
   if (!selectedBidder) {
     return;
   }
@@ -370,10 +374,14 @@ export const updateProductStatusOnSuccess = async ({
   selectedBidder.paymentInfo.paymentAmount = selectedBidder.bidAmount;
 
   const winner = await User.findById({ _id: selectedBidder.bidder });
+  console.log('winner',winner)
   if (!winner) return;
 
   winner.bidWon.push({ product: product._id });
   const seller = await User.findById({ _id: product.createdBy });
+
+  console.log('seller',seller)
+
   if (!seller) return;
   seller.revenue += selectedBidder.bidAmount;
   await seller.save();
@@ -399,6 +407,7 @@ export const updateProductStatusOnSuccess = async ({
     amount: selectedBidder.bidAmount
   }
   );
+  console.log("ENding")
   await product.save();
   await winner.save();
   return;

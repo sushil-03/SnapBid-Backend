@@ -1,0 +1,50 @@
+version: "3.8"
+
+services:
+  snapbid:
+    image: sushil358/snapbid-backend:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - DB_PASS=${DB_PASS}
+      - JWT_SECRET=${JWT_SECRET}
+      - CLOUDINARY_NAME=${CLOUDINARY_NAME}
+      - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
+      - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}
+      - NODEMAILERUSER=${NODEMAILERUSER}
+      - NODEMAILERPASS=${NODEMAILERPASS}
+      - STRIPE_PUBLISHABLE_KEY=${STRIPE_PUBLISHABLE_KEY}
+      - CLIENT_ID=${CLIENT_ID}
+      - CLIENT_SECRET=${CLIENT_SECRET}
+      - REFRESH_TOKEN=${REFRESH_TOKEN}
+      - JWT_EXPIRE=5d
+      - COOKIE_EXPIRE=2
+    ports:
+      - "8000:8000"
+    networks:
+      - monitoring
+
+    command: ["node", "dist/index.js"]
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - monitoring
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    networks:
+      - monitoring
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+
+networks:
+  monitoring:
+    driver: bridge
