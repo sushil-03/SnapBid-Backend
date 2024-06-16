@@ -7,7 +7,7 @@ jspm_packages
 # Serverless directories
 .serverless
 
-config/config.env
+src/config/config.env
 # Logs  
 logs
 *.log
