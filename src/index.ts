@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 require("dotenv").config({
   path: __dirname + "/config/config.env"
 });
+require('newrelic');
 import bodyParser from "body-parser";
 import connectDatabase from './config/datatbase'
 import { v2 as cloudinary } from "cloudinary";
@@ -47,6 +48,7 @@ app.post(
   express.json({ type: "application/json" }),
   async (request, response) => {
     const event = request.body;
+    console.log('event called',event);
 
     switch (event.type) {
       case "payment_intent.succeeded":

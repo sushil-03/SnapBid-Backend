@@ -7,14 +7,13 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npm install && tsc  && cp ./src/config/config.env ./dist/config/config.env",
     "dev": "tsc -w && nodemon dist/index.js",
+
+    "monitor":"NEW_RELIC_APP_NAME=snapbid NEW_RELIC_LICENSE_KEY=66fd2a39ed63f8cb3f3b74a7e602a058FFFFNRAL node -r newrelic dist/index.js",
     "start": "node dist/index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "engines": {
-    "node": ">=18.18.0 <19.0.0"
-  },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
     "@types/cookie-parser": "^1.4.7",
@@ -36,8 +35,10 @@
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.3.4",
+    "newrelic": "^11.19.0",
     "node-schedule": "^2.1.1",
     "nodemailer": "^6.9.13",
+    "pm2": "^5.3.1",
     "stripe": "^15.6.0",
     "validator": "^13.11.0"
   }
