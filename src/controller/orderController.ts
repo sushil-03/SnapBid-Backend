@@ -96,6 +96,11 @@ export const updateOrder = async (req: AuthenticatedRequest, res: Response) => {
   if (user.toString() === product.createdBy.toString()) {
     order.status = order_status;
     product.paymentReceived = payment_status;
+    if (payment_status === true) {
+      product.status = "Completed"
+    } else {
+      product.status = "PaymentOnDelivery"
+    }
     await order.save();
     await product.save();
     return res.status(200).json({
